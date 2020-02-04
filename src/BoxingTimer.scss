@@ -1,0 +1,20 @@
+ul.roundTracker {
+  list-style: none;
+  display: flex;
+  li {
+    flex: 1 0 auto;
+    padding: 3px;
+    // display: inline-block;
+    &:before {
+      content: "";
+      display: block;
+      background: red;
+      margin: auto;
+      width: 90%;
+      height: 5px;
+    }
+    &.filled::before {
+      background-color: white;
+    }
+  }
+}
