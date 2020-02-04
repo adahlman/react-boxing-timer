@@ -10,6 +10,7 @@ import {
   MenuItem,
   Select
 } from "@material-ui/core/";
+import leadingZero from "./functions";
 
 export default class RoundSettings extends React.Component {
   constructor(props) {
@@ -47,7 +48,7 @@ export default class RoundSettings extends React.Component {
     for (let i = 0; i <= scale; i++) {
       element.push(
         <MenuItem value={i} key={i.toString()}>
-          {i}
+          {leadingZero(i)}
         </MenuItem>
       );
     }

@@ -3,6 +3,7 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 import { Button, Grid, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import leadingZero from "./functions";
 
 import "./Clock.scss";
 
@@ -25,7 +26,6 @@ export default class Clock extends React.Component {
     this.state = {
       timeRemaining: null,
       matchEnded: props.matchEnded,
-      seconds: props.timeRemaining,
       running: false
     };
     this.handleToggle = this.handleToggle.bind(this);
@@ -110,10 +110,6 @@ export default class Clock extends React.Component {
       </div>
     );
   }
-}
-
-function leadingZero(number) {
-  return number < 10 ? "0" + number : number;
 }
 
 function toMinutes(milliseconds) {
