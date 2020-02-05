@@ -17,8 +17,31 @@ const useStyles = makeStyles(theme => ({
   // },
   clockFace: {
     padding: theme.spacing(2)
+  },
+  running: {
+    backgroundColor: theme.palette.success.main
+  },
+  paused: {
+    backgroundColor: theme.palette.warning.light
+  },
+  ended: {
+    background: theme.palette.error.main
   }
 }));
+
+function ClockFace(props) {
+  const classes = useStyles();
+  const timeRemaining = props.timeRemaining;
+  const minutes = leadingZero(toMinutes(timeRemaining));
+  const seconds = leadingZero(toSeconds(timeRemaining));
+  return (
+    <Paper className={props.status ? classes.running : classes.paused}>
+      <h3 className='digital'>
+        {minutes}:{seconds}
+      </h3>
+    </Paper>
+  );
+}
 
 export default class Clock extends React.Component {
   constructor(props) {
@@ -26,7 +49,9 @@ export default class Clock extends React.Component {
     this.state = {
       timeRemaining: props.timeRemaining,
       matchEnded: props.matchEnded,
-      running: false
+      running: false,
+      started: false,
+      waiting: true
     };
     this.handleToggle = this.handleToggle.bind(this);
     this.handleReset = this.handleReset.bind(this);
@@ -48,14 +73,22 @@ export default class Clock extends React.Component {
   }
 
   beginRound() {
-    clearInterval(this.timer);
-    this.setState({
-      timeRemaining: this.props.timeRemaining
-    });
-    // setTimeout(() => {
-    //   console.log(this.state);
-    this.start();
-    // }, 2000);
+    console.log("begin");
+
+    if (this.props.countDown) {
+      console.log("countdown", this.state.running);
+      clearInterval(this.timer);
+      this.setState({
+        timeRemaining: this.props.timeRemaining
+        // started: true,
+      });
+      setTimeout(() => {
+        this.start();
+      }, 2000);
+    } else {
+      console.log("no countdown");
+      this.start();
+    }
   }
   start() {
     if (!this.state.running && !this.props.matchEnded) {
@@ -77,34 +110,30 @@ export default class Clock extends React.Component {
     if (seconds <= 0) {
       this.props.incrementRound();
       this.stop();
-      // this.beginRound();
       if (!this.props.matchEnded) {
         this.setState({ timeRemaining: this.props.timeRemaining });
       }
+      this.beginRound();
 
-      this.start();
+      // this.start();
       return;
     }
     this.setState({
       timeRemaining: seconds - 1000
     });
   };
-  renderClock(minutes, seconds) {}
   render() {
-    const timeRemaining = this.state.timeRemaining;
-    const minutes = leadingZero(toMinutes(timeRemaining));
-    const seconds = leadingZero(toSeconds(timeRemaining));
     const running = this.state.running;
 
     return (
       <div>
+        {this.props.countDown ? "waiting" : "regular"}
         <Grid container direction='row' justify='center' alignItems='center'>
           <Grid item xs={12}>
-            <Paper>
-              <h3 className='digital'>
-                {minutes}:{seconds}
-              </h3>
-            </Paper>
+            <ClockFace
+              timeRemaining={this.state.timeRemaining}
+              status={this.state.running}
+            />
           </Grid>
           <Grid item xs={6}>
             <Button
@@ -117,7 +146,7 @@ export default class Clock extends React.Component {
           </Grid>
           <Grid item xs={6}>
             <Button variant='contained' onClick={this.handleReset}>
-              Reset
+              Restart Round
             </Button>
           </Grid>
         </Grid>

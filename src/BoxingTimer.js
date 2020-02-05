@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
   // },
   complete: {
     filled: {
-      background: theme.palette.primary
+      // background: theme.palette.primary
     }
   }
 }));
@@ -94,6 +94,7 @@ export default class BoxingTimer extends React.Component {
     const numberOfRounds = this.state.numberOfRounds;
     const seconds = this.state.seconds;
     const minutes = this.state.minutes;
+    const restRound = this.state.restRound;
     const roundsCompleted = this.state.roundsCompleted;
     const timeRemaining = this.state.restRound
       ? toMilliseconds(0, this.state.restSeconds)
@@ -115,8 +116,8 @@ export default class BoxingTimer extends React.Component {
         <Clock
           matchEnded={this.state.matchEnded}
           timeRemaining={timeRemaining}
+          countDown={!restRound}
           incrementRound={() => this.incrementRound()}
-          className='restRound'
         />
         <Combos />
       </div>
