@@ -53,20 +53,16 @@ export default class BoxingTimer extends React.Component {
       matchEnded: false,
       minutes: 0,
       seconds: 8,
-      restSeconds: 4
+      restSeconds: 4,
+      canEdit: true
     };
     this.changeSettings = this.changeSettings.bind(this);
+    this.lockSettings = this.lockSettings.bind(this);
   }
 
   incrementRound() {
     const roundsCompleted = this.state.roundsCompleted;
     const restRound = this.state.restRound;
-    console.log(
-      "restRound ",
-      restRound,
-      roundsCompleted,
-      this.state.matchEnded
-    );
     if (roundsCompleted < this.state.numberOfRounds - 1) {
       if (restRound) {
         this.setState({ roundsCompleted: roundsCompleted + 1 });
@@ -75,12 +71,14 @@ export default class BoxingTimer extends React.Component {
         restRound: !restRound
       });
     } else {
-      this.setState({
-        matchEnded: true
-      });
+      this.setState({ matchEnded: true, canEdit: true });
     }
   }
 
+  lockSettings(event) {
+    console.log("lock");
+    this.setState({ canEdit: false });
+  }
   changeSettings(event) {
     Object.entries(event).map(([key, value]) => {
       console.log(key, value);
@@ -88,6 +86,7 @@ export default class BoxingTimer extends React.Component {
         [key]: value
       });
     });
+    this.setState({ roundsCompleted: 0, matchEnded: false });
   }
 
   render() {
@@ -105,6 +104,7 @@ export default class BoxingTimer extends React.Component {
           numberOfRounds={numberOfRounds}
           minutes={minutes}
           seconds={seconds}
+          edit={this.state.canEdit}
           updateSettings={this.changeSettings}
         />
         {this.state.restRound ? "Resting" : "Go"}
@@ -117,6 +117,7 @@ export default class BoxingTimer extends React.Component {
           matchEnded={this.state.matchEnded}
           timeRemaining={timeRemaining}
           countDown={!restRound}
+          lockSettings={this.lockSettings}
           incrementRound={() => this.incrementRound()}
         />
         <Combos />

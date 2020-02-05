@@ -64,7 +64,10 @@ export default class RoundSettings extends React.Component {
     const secondsOptions = this.renderSelect(59);
     return (
       <div>
-        <Button variant='contained' onClick={this.handleOpenDialog}>
+        <Button
+          variant='contained'
+          onClick={this.handleOpenDialog}
+          disabled={!this.props.edit}>
           Open Settings
         </Button>
         <Dialog open={open} onClose={this.handleCloseDialog}>

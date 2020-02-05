@@ -59,6 +59,7 @@ export default class Clock extends React.Component {
 
   handleToggle() {
     const running = this.state.running;
+    this.props.lockSettings();
     if (!this.props.matchEnded) {
       running ? this.stop() : this.start();
     }
