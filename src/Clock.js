@@ -24,7 +24,7 @@ export default class Clock extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeRemaining: null,
+      timeRemaining: props.timeRemaining,
       matchEnded: props.matchEnded,
       running: false
     };
@@ -47,11 +47,21 @@ export default class Clock extends React.Component {
     }
   }
 
+  beginRound() {
+    clearInterval(this.timer);
+    this.setState({
+      timeRemaining: this.props.timeRemaining
+    });
+    // setTimeout(() => {
+    //   console.log(this.state);
+    this.start();
+    // }, 2000);
+  }
   start() {
-    if (!this.state.running) {
-      if (!this.state.timeRemaining) {
-        this.setState({ timeRemaining: this.props.timeRemaining });
-      }
+    if (!this.state.running && !this.props.matchEnded) {
+      // if (!this.state.timeRemaining) {
+      //   this.setState({ timeRemaining: this.props.timeRemaining });
+      // }
       this.setState({
         running: true
       });
@@ -66,7 +76,13 @@ export default class Clock extends React.Component {
     let seconds = this.state.timeRemaining;
     if (seconds <= 0) {
       this.props.incrementRound();
-      this.handleReset();
+      this.stop();
+      // this.beginRound();
+      if (!this.props.matchEnded) {
+        this.setState({ timeRemaining: this.props.timeRemaining });
+      }
+
+      this.start();
       return;
     }
     this.setState({
@@ -75,9 +91,7 @@ export default class Clock extends React.Component {
   };
   renderClock(minutes, seconds) {}
   render() {
-    const timeRemaining = this.state.timeRemaining
-      ? this.state.timeRemaining
-      : this.props.timeRemaining;
+    const timeRemaining = this.state.timeRemaining;
     const minutes = leadingZero(toMinutes(timeRemaining));
     const seconds = leadingZero(toSeconds(timeRemaining));
     const running = this.state.running;

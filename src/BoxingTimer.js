@@ -37,7 +37,9 @@ function Round(props) {
   return (
     <div>
       <h1>Round {props.roundsCompleted + 1}</h1>
-      <ul className='roundTracker'>{progress}</ul>
+      <ul className={`roundTracker ${props.restRound ? "resting" : ""}`}>
+        {progress}
+      </ul>
     </div>
   );
 }
@@ -50,9 +52,8 @@ export default class BoxingTimer extends React.Component {
       restRound: false,
       matchEnded: false,
       minutes: 0,
-      seconds: 15,
-      restSeconds: 4,
-      timeRemaining: 0
+      seconds: 8,
+      restSeconds: 4
     };
     this.changeSettings = this.changeSettings.bind(this);
   }
@@ -60,6 +61,12 @@ export default class BoxingTimer extends React.Component {
   incrementRound() {
     const roundsCompleted = this.state.roundsCompleted;
     const restRound = this.state.restRound;
+    console.log(
+      "restRound ",
+      restRound,
+      roundsCompleted,
+      this.state.matchEnded
+    );
     if (roundsCompleted < this.state.numberOfRounds - 1) {
       if (restRound) {
         this.setState({ roundsCompleted: roundsCompleted + 1 });
@@ -88,7 +95,7 @@ export default class BoxingTimer extends React.Component {
     const seconds = this.state.seconds;
     const minutes = this.state.minutes;
     const roundsCompleted = this.state.roundsCompleted;
-    const timeRemaining = false
+    const timeRemaining = this.state.restRound
       ? toMilliseconds(0, this.state.restSeconds)
       : toMilliseconds(minutes, seconds);
     return (
@@ -99,18 +106,18 @@ export default class BoxingTimer extends React.Component {
           seconds={seconds}
           updateSettings={this.changeSettings}
         />
+        {this.state.restRound ? "Resting" : "Go"}
         <Round
           numberOfRounds={numberOfRounds}
           roundsCompleted={roundsCompleted}
+          restRound={this.state.restRound}
         />
-        <Box>
-          <Clock
-            matchEnded={this.state.matchEnded}
-            seconds={seconds}
-            timeRemaining={timeRemaining}
-            incrementRound={() => this.incrementRound()}
-          />
-        </Box>
+        <Clock
+          matchEnded={this.state.matchEnded}
+          timeRemaining={timeRemaining}
+          incrementRound={() => this.incrementRound()}
+          className='restRound'
+        />
         <Combos />
       </div>
     );
