@@ -1,16 +1,42 @@
 import React from "react";
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  Grid,
   FormLabel,
   MenuItem,
   Select
 } from "@material-ui/core/";
 import leadingZero from "./functions";
+
+function renderSelect(scale, min = 0) {
+  let element = [];
+  for (let i = min; i <= scale; i++) {
+    element.push(
+      <MenuItem value={i} key={i.toString()}>
+        {leadingZero(i)}
+      </MenuItem>
+    );
+  }
+  return element;
+}
+
+function CreateSelect(props) {
+  const options = renderSelect(props.max, props.min);
+  return (
+    <Select
+      name={props.name}
+      value={props.value}
+      onChange={props.handleInputChange}>
+      {options}
+    </Select>
+  );
+}
 
 export default class RoundSettings extends React.Component {
   constructor(props) {
@@ -29,9 +55,9 @@ export default class RoundSettings extends React.Component {
   handleOpenDialog() {
     this.setState({ open: true });
   }
-  handleCloseDialog() {
+  handleCloseDialog = () => {
     this.setState({ open: false });
-  }
+  };
   handleInputChange(event) {
     const target = event.target;
     this.setState({
@@ -41,67 +67,67 @@ export default class RoundSettings extends React.Component {
   handleSubmit(event) {
     this.props.updateSettings(this.state);
     this.handleCloseDialog();
-    // event.preventDefault();
   }
-  renderSelect(scale) {
-    let element = [];
-    for (let i = 0; i <= scale; i++) {
-      element.push(
-        <MenuItem value={i} key={i.toString()}>
-          {leadingZero(i)}
-        </MenuItem>
-      );
-    }
-    return element;
-  }
+
   render() {
     const open = this.state.open;
     const numberOfRounds = this.state.numberOfRounds;
     const seconds = this.state.seconds;
     const minutes = this.state.minutes;
-    const numberOfRoundOptions = this.renderSelect(10);
-    const minutesOptions = this.renderSelect(15);
-    const secondsOptions = this.renderSelect(59);
     return (
       <div>
-        <Button
-          variant='contained'
-          onClick={this.handleOpenDialog}
-          disabled={!this.props.edit}>
-          Open Settings
-        </Button>
+        <Grid container justify='flex-end'>
+          <Button
+            variant='contained'
+            onClick={this.handleOpenDialog}
+            disabled={!this.props.edit}>
+            Settings
+          </Button>
+        </Grid>
+
         <Dialog open={open} onClose={this.handleCloseDialog}>
           <DialogTitle>Round Settings</DialogTitle>
           <DialogContent>
             <form onSubmit={this.handleSubmit}>
               <FormControl>
                 <FormLabel component='legend'>Number of Rounds</FormLabel>
-                <Select
+                <CreateSelect
                   name='numberOfRounds'
                   value={numberOfRounds}
-                  onChange={this.handleInputChange}>
-                  {numberOfRoundOptions}
-                </Select>
+                  handleInputChange={this.handleInputChange}
+                  max={10}
+                  min={1}
+                />
               </FormControl>
-              <br />
-              <FormLabel component='legend'>Round Length:</FormLabel>
-              <FormControl>
-                <Select
-                  name='minutes'
-                  value={minutes}
-                  onChange={this.handleInputChange}>
-                  {minutesOptions}
-                </Select>
-              </FormControl>
-              :
-              <FormControl>
-                <Select
-                  name='seconds'
-                  value={seconds}
-                  onChange={this.handleInputChange}>
-                  {secondsOptions}
-                </Select>
-              </FormControl>
+              <Box>
+                <FormLabel component='legend'>Round Length:</FormLabel>
+
+                <Grid container alignItems='center'>
+                  <Grid item xs={3}>
+                    <FormControl>
+                      <CreateSelect
+                        name='minutes'
+                        value={minutes}
+                        max={15}
+                        handleInputChange={this.handleInputChange}
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={3} style={{ textAlign: "center" }}>
+                    <span>:</span>
+                  </Grid>
+                  <Grid item xs={3}>
+                    <FormControl>
+                      <CreateSelect
+                        name='seconds'
+                        value={seconds}
+                        max={59}
+                        handleInputChange={this.handleInputChange}
+                      />
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </Box>
             </form>
           </DialogContent>
           <DialogActions>
