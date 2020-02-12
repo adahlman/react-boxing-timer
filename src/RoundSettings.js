@@ -47,14 +47,13 @@ export default class RoundSettings extends React.Component {
       seconds: props.seconds,
       open: false
     };
-    this.handleOpenDialog = this.handleOpenDialog.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
-  handleOpenDialog() {
+  handleOpenDialog = () => {
     this.setState({ open: true });
-  }
+  };
   handleCloseDialog = () => {
     this.setState({ open: false });
   };

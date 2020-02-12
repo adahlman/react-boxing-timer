@@ -35,7 +35,7 @@ function Round(props) {
   }
 
   return (
-    <div>
+    <div className={props.restRound ? "resting" : ""}>
       <h1>Round {props.roundsCompleted + 1}</h1>
       <ul className={`roundTracker ${props.restRound ? "resting" : ""}`}>
         {progress}
@@ -47,7 +47,7 @@ export default class BoxingTimer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      numberOfRounds: 5,
+      numberOfRounds: 3,
       roundsCompleted: 0,
       restRound: false,
       matchEnded: false,
@@ -67,24 +67,25 @@ export default class BoxingTimer extends React.Component {
       if (restRound) {
         this.setState({ roundsCompleted: roundsCompleted + 1 });
       }
-      this.setState({
-        restRound: !restRound
-      });
+      this.setState({ restRound: !restRound });
     } else {
       this.setState({ matchEnded: true, canEdit: true });
     }
   }
 
   lockSettings(event) {
-    console.log("lock");
-    this.setState({ canEdit: false });
+    this.setState({ canEdit: event });
+    if (event) {
+      this.setState({
+        roundsCompleted: 0,
+        restRound: false,
+        matchEnded: false
+      });
+    }
   }
   changeSettings(event) {
     Object.entries(event).map(([key, value]) => {
-      console.log(key, value);
-      this.setState({
-        [key]: value
-      });
+      this.setState({ [key]: value });
     });
     this.setState({ roundsCompleted: 0, matchEnded: false });
   }
@@ -95,9 +96,9 @@ export default class BoxingTimer extends React.Component {
     const minutes = this.state.minutes;
     const restRound = this.state.restRound;
     const roundsCompleted = this.state.roundsCompleted;
-    const timeRemaining = this.state.restRound
-      ? toMilliseconds(0, this.state.restSeconds)
-      : toMilliseconds(minutes, seconds);
+    const timeRemaining = restRound
+      ? toMilliseconds(this.state.restSeconds)
+      : toMilliseconds(seconds, minutes);
     return (
       <div>
         <RoundSettings
@@ -107,11 +108,10 @@ export default class BoxingTimer extends React.Component {
           edit={this.state.canEdit}
           updateSettings={this.changeSettings}
         />
-        {this.state.restRound ? "Resting" : "Go"}
         <Round
           numberOfRounds={numberOfRounds}
           roundsCompleted={roundsCompleted}
-          restRound={this.state.restRound}
+          restRound={restRound}
         />
         <Clock
           matchEnded={this.state.matchEnded}
@@ -126,6 +126,6 @@ export default class BoxingTimer extends React.Component {
   }
 }
 
-function toMilliseconds(minutes, seconds) {
+function toMilliseconds(seconds, minutes = 0) {
   return minutes * 60000 + seconds * 1000;
 }
