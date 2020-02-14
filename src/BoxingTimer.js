@@ -1,39 +1,15 @@
 import React from "react";
 
-import { Box, Container, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { Dialog, DialogActions } from "@material-ui/core/";
 import "./BoxingTimer.scss";
 
 import Clock from "./Clock";
 import Combos from "./Combos";
 import RoundSettings from "./RoundSettings";
 
-const useStyles = makeStyles(theme => ({
-  // root: {
-  //   margin: theme.spacing(6, 0, 3),
-  // },
-  // lightBulb: {
-  //   verticalAlign: 'middle',
-  //   marginRight: theme.spacing(1),
-  // },
-  complete: {
-    filled: {
-      // background: theme.palette.primary
-    }
-  }
-}));
-
-function renderProgress(i, complete) {
-  return <li key={i} className={complete ? "filled" : ""}></li>;
-}
 function Round(props) {
-  const classes = useStyles();
-  let progress = [];
-  for (let i = 0; i < props.numberOfRounds; i++) {
-    progress.push(renderProgress(i, i <= props.roundsCompleted));
-  }
-
+  const progress = [...Array(props.numberOfRounds)].map((e, i) => (
+    <li className={i <= props.roundsCompleted ? "filled" : ""} key={i}></li>
+  ));
   return (
     <div className={props.restRound ? "resting" : ""}>
       <h1>Round {props.roundsCompleted + 1}</h1>
@@ -52,8 +28,9 @@ export default class BoxingTimer extends React.Component {
       restRound: false,
       matchEnded: false,
       minutes: 0,
-      seconds: 8,
+      seconds: 20,
       restSeconds: 4,
+      combos: false, // not implemented yet
       canEdit: true
     };
     this.changeSettings = this.changeSettings.bind(this);
@@ -106,6 +83,7 @@ export default class BoxingTimer extends React.Component {
           minutes={minutes}
           seconds={seconds}
           edit={this.state.canEdit}
+          combos={this.state.combos}
           updateSettings={this.changeSettings}
         />
         <Round
@@ -120,7 +98,15 @@ export default class BoxingTimer extends React.Component {
           lockSettings={this.lockSettings}
           incrementRound={() => this.incrementRound()}
         />
-        <Combos />
+
+        {/* TODO: Implement combo generator */}
+        {/* {!this.state.combos ? null : (
+          <Combos
+            running={
+              !restRound && !this.state.matchEnded && !this.state.canEdit
+            }
+          />
+        )} */}
       </div>
     );
   }

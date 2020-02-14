@@ -1,13 +1,72 @@
 @import url(https://fonts.googleapis.com/css?family=Orbitron);
 $orbitron: "Orbitron", sans-serif;
 $mono: "Courier New", Courier, monospace;
-.digital {
-  font-family: $orbitron;
+h2.digital {
   font-family: $mono;
-  font-size: 40px;
-  text-align: center;
+  font-weight: bold;
 }
 
 .restRound {
   background: orange;
+}
+
+.example-enter {
+  opacity: 0.01;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.example-leave {
+  opacity: 1;
+}
+
+.example {
+  opacity: 0;
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.fade-enter {
+  opacity: 0.01;
+}
+
+.fade-enter.fade-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+  @for $i from 1 through 10 {
+    &.example-#{$i} {
+      transition-delay: ($i * 1000ms);
+    }
+  }
+}
+
+.fade-leave {
+  opacity: 1;
+}
+
+.fade-leave.fade-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.emp {
+  div {
+    opacity: 1;
+  }
+}
+.empty {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+  transition-delay: 3s;
+  @for $i from 1 through 10 {
+    &.empty-#{$i} {
+      transition-delay: ($i * 1000ms);
+    }
+  }
 }

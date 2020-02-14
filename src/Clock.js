@@ -1,52 +1,8 @@
 import React from "react";
 
-import Typography from "@material-ui/core/Typography";
-import { Box, Button, Grid, Paper } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import leadingZero from "./functions";
-
+import Clockface from "./Clockface";
+import { Button, Grid } from "@material-ui/core";
 import "./Clock.scss";
-
-const useStyles = makeStyles(theme => ({
-  clockFace: {
-    padding: theme.spacing(2)
-  },
-  running: {
-    backgroundColor: theme.palette.success.main
-  },
-  resting: {
-    backgroundColor: theme.palette.warning.light,
-    span: {}
-  },
-  ending: {
-    background: theme.palette.error.main
-  },
-  "@keyframes flash": {
-    "0%": { opacity: 1 },
-    "50%": { opacity: 0.1 },
-    "100%": { opacity: 1 }
-  },
-  paused: {
-    animation: "$flash 2s linear infinite"
-  }
-}));
-
-function ClockFace(props) {
-  const classes = useStyles();
-  const minutes = leadingZero(toMinutes(props.timeRemaining));
-  const seconds = leadingZero(toSeconds(props.timeRemaining));
-  const status = props.status;
-  console.log(props);
-  return (
-    <Paper className={status ? classes[status] : ""}>
-      <h3 className='digital'>
-        <span className={props.paused ? classes.paused : ""}>
-          {minutes}:{seconds}
-        </span>
-      </h3>
-    </Paper>
-  );
-}
 
 export default class Clock extends React.Component {
   constructor(props) {
@@ -68,15 +24,18 @@ export default class Clock extends React.Component {
   componentDidMount() {
     document.addEventListener("keydown", this.handleKeyPress);
   }
+
   componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeyPress);
     clearInterval(this.timer);
   }
+
   handleKeyPress(event) {
     if (event.keyCode === 32 && !this.props.matchEnded && !this.state.waiting) {
       this.handleToggle();
     }
   }
+
   handleResetAll() {
     clearInterval(this.timer);
     this.setState({
@@ -86,6 +45,7 @@ export default class Clock extends React.Component {
     });
     this.props.lockSettings(true);
   }
+
   handleToggle() {
     const running = this.state.running;
     const started = this.state.started;
@@ -141,7 +101,7 @@ export default class Clock extends React.Component {
   }
   tick = () => {
     let seconds = this.state.timeRemaining;
-    if (seconds === 2000) {
+    if (seconds === 10000) {
       this.setState({
         warning: true
       });
@@ -178,11 +138,10 @@ export default class Clock extends React.Component {
       ? this.state.timeRemaining
       : this.props.timeRemaining;
     const status = this.getStatus();
-    console.log(this.state);
 
     return (
       <div>
-        <ClockFace
+        <Clockface
           timeRemaining={timeRemaining}
           status={status}
           paused={
@@ -227,11 +186,4 @@ export default class Clock extends React.Component {
       </div>
     );
   }
-}
-
-function toMinutes(milliseconds) {
-  return Math.floor(milliseconds / 60000);
-}
-function toSeconds(milliseconds) {
-  return ((milliseconds % 60000) / 1000).toFixed(0);
 }

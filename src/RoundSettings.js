@@ -10,19 +10,21 @@ import {
   Grid,
   FormLabel,
   MenuItem,
-  Select
+  Select,
+  Switch
 } from "@material-ui/core/";
-import leadingZero from "./functions";
+import leadingZero from "./utils";
 
 function renderSelect(scale, min = 0) {
-  let element = [];
-  for (let i = min; i <= scale; i++) {
-    element.push(
-      <MenuItem value={i} key={i.toString()}>
-        {leadingZero(i)}
+  const range = scale - min + 1;
+  const element = [...Array(range)].map((e, i) => {
+    const key = min + i;
+    return (
+      <MenuItem value={key} key={key}>
+        {leadingZero(key)}
       </MenuItem>
     );
-  }
+  });
   return element;
 }
 
@@ -45,6 +47,7 @@ export default class RoundSettings extends React.Component {
       numberOfRounds: props.numberOfRounds,
       minutes: props.minutes,
       seconds: props.seconds,
+      combos: props.combos,
       open: false
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -60,9 +63,15 @@ export default class RoundSettings extends React.Component {
   handleInputChange(event) {
     const target = event.target;
     this.setState({
-      [target.name]: target.value
+      [target.name]: target.type === "checkbox" ? target.checked : target.value
     });
   }
+  handleSwitchChange = event => {
+    const target = event.target;
+    this.setState({
+      [target.name]: target.checked
+    });
+  };
   handleSubmit(event) {
     this.props.updateSettings(this.state);
     this.handleCloseDialog();
@@ -126,6 +135,15 @@ export default class RoundSettings extends React.Component {
                     </FormControl>
                   </Grid>
                 </Grid>
+                {/* <FormControl>
+                  <FormLabel component='legend'>Combos:</FormLabel>
+                  <Switch
+                    checked={this.state.combos}
+                    name='combos'
+                    value='combos'
+                    onChange={this.handleInputChange}
+                  />
+                </FormControl> */}
               </Box>
             </form>
           </DialogContent>

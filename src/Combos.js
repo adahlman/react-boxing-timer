@@ -1,43 +1,77 @@
+/* TODO: Not yet implemented */
 import React from "react";
-import { Button } from "@material-ui/core";
+import { Box, Button, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+
+import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+
+import "./Clock.scss";
+
+function RenderedMoves(props) {
+  const position = props.moves.length - 1;
+  if (position < 0) {
+    return null;
+  }
+  const moves = props.moves[position];
+  const items = moves.map((item, i) => (
+    <div key={i + "" + position} className={"empty empty-" + (i + 1)}>
+      {item.name}
+    </div>
+  ));
+
+  return (
+    <div>
+      <div className={props.show ? "emp" : ""}>{items}</div>
+    </div>
+  );
+}
 
 export default class Combos extends React.Component {
   constructor(props) {
     super(props);
+    this.timeout = null;
     this.state = {
-      movesList: []
+      movesList: [],
+      animate: false
     };
   }
 
-  renderMoves() {
-    const moves = this.state.movesList;
-    console.log(moves);
-    const allMoves = moves.map((val, index) => {
-      console.log(val.name, index);
-      return index;
-    });
-    console.log(allMoves);
-  }
-
   addNewCombo = () => {
+    if (!this.props.running) {
+      return;
+    }
+    this.setState({ animate: false });
     const maxMoves = 10;
     const numberOfMoves = Math.floor(Math.random() * maxMoves) + 1;
-    let moveList = [];
-    for (let i = 0; i < numberOfMoves; i++) {
-      let random = Math.floor(Math.random() * moves.length);
-      moveList.push(moves[random]);
-    }
-    console.log(numberOfMoves, moveList);
-    this.setState({
-      movesList: moveList
+    const newMoves = [...Array(numberOfMoves)].map((value, i) => {
+      const random = Math.floor(Math.random() * moves.length);
+      return moves[random];
     });
-    this.renderMoves();
+    this.setState(state => ({
+      movesList: [...state.movesList, newMoves]
+    }));
+    // this.renderMoves();
+    setTimeout(() => {
+      this.setState({ animate: true });
+    }, 0);
+    // setTimeout(() => {
+    //   console.log("stop");
+    //   this.setState({
+    //     animate: false
+    //   });
+    //   clearTimeout(this.timeout);
+    // }, 3000);
+
+    this.timeout = setTimeout(() => {
+      this.addNewCombo();
+    }, 1000 * numberOfMoves + 4000);
   };
 
   render() {
     return (
       <div>
         <Button onClick={this.addNewCombo}>Add Move</Button>
+        <RenderedMoves moves={this.state.movesList} show={this.state.animate} />
       </div>
     );
   }
