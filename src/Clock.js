@@ -12,32 +12,31 @@ export default class Clock extends React.Component {
     super(props);
     this.state = {
       timeRemaining: props.timeRemaining,
-      matchEnded: props.matchEnded,
-      running: false,
-      started: false,
       warning: false,
-      waiting: false,
-      runStatus: RunStatus.NotStarted,
     };
     this.handleToggle = this.handleToggle.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleResetAll = this.handleResetAll.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
-    console.log("start", this.props.runStatus);
   }
 
   componentDidMount() {
-    document.addEventListener("keydown", this.handleKeyPress);
+    document.addEventListener("keyup", this.handleKeyPress);
   }
 
   componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyPress);
+    document.removeEventListener("keyup", this.handleKeyPress);
     clearInterval(this.timer);
   }
 
   handleKeyPress(event) {
-    if (event.keyCode === 32 && !this.props.matchEnded && !this.state.waiting) {
-      this.handleToggle();
+    const runStatus = this.props.runStatus;
+    console.log(runStatus);
+    if (
+      event.keyCode === 32 &&
+      (runStatus !== RunStatus.Ended || runStatus !== RunStatus.Waiting)
+    ) {
+      this.handleToggle(event);
     }
   }
 
@@ -51,24 +50,23 @@ export default class Clock extends React.Component {
   }
 
   handleToggle() {
-    const running = this.state.running;
     const runStatus = this.props.runStatus;
     if (runStatus === RunStatus.NotStarted) {
       this.setState({
-        started: true,
         timeRemaining: this.props.timeRemaining,
       });
-      this.props.runStatusChange(RunStatus.running);
+      this.start();
       this.props.lockSettings(false);
+      return;
     }
-    if (!this.props.matchEnded) {
-      running ? this.stop() : this.start();
+    if (this.props.runStatus !== RunStatus.Ended) {
+      this.props.runStatus === RunStatus.Running ? this.stop() : this.start();
     }
   }
 
   handleReset() {
     this.stop();
-    if (!this.props.matchEnded) {
+    if (this.props.runStatus !== RunStatus.Ended) {
       this.setState({ timeRemaining: this.props.timeRemaining });
       this.start();
     }
@@ -79,18 +77,12 @@ export default class Clock extends React.Component {
       clearInterval(this.timer);
       this.setState({
         timeRemaining: this.props.timeRemaining,
-        warning: false,
-        running: false,
-        waiting: true,
-        runStatus: RunStatus.Waiting,
       });
       this.props.runStatusChange(RunStatus.Waiting);
       setTimeout(() => {
-        this.setState({ waiting: false });
         this.start();
       }, 2000);
     } else {
-      this.setState({ warning: false });
       this.start();
     }
   }
@@ -100,16 +92,11 @@ export default class Clock extends React.Component {
       this.props.runStatus === RunStatus.NotStarted ||
       this.props.runStatus === RunStatus.Waiting
     ) {
-      this.setState({
-        running: true,
-        runStatus: RunStatus.Running,
-      });
       this.props.runStatusChange(RunStatus.Running);
       this.timer = setInterval(this.tick, 1000);
     }
   }
   stop() {
-    this.setState({ running: false, runStatus: RunStatus.Paused });
     if (this.props.runStatus !== RunStatus.Ended) {
       this.props.runStatusChange(RunStatus.Paused);
     }
@@ -117,19 +104,24 @@ export default class Clock extends React.Component {
   }
   tick = () => {
     let seconds = this.state.timeRemaining;
+    if (seconds <= 0) {
+      this.props.incrementRound();
+      this.stop();
+      this.setState({
+        warning: false,
+      });
+      if (this.props.runStatus !== RunStatus.Ended) {
+        this.setState({
+          timeRemaining: this.props.timeRemaining,
+        });
+        this.beginRound();
+      }
+      return;
+    }
     if (seconds === 10000) {
       this.setState({
         warning: true,
       });
-    }
-    if (seconds <= 0) {
-      this.props.incrementRound();
-      this.stop();
-      if (!this.props.matchEnded) {
-        this.setState({ timeRemaining: this.props.timeRemaining });
-        this.beginRound();
-      }
-      return;
     }
     this.setState({
       timeRemaining: seconds - 1000,
@@ -137,14 +129,13 @@ export default class Clock extends React.Component {
   };
 
   render() {
-    const running = this.state.running;
     const runStatus = this.props.runStatus;
     const timeRemaining =
       runStatus !== RunStatus.NotStarted
         ? this.state.timeRemaining
         : this.props.timeRemaining;
-    lookup(this.props.runStatus, RunStatus);
-
+    // lookup(this.props.runStatus, RunStatus);
+    // console.log("render", this.state);
     return (
       <div>
         <Clockface

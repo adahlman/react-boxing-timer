@@ -33,6 +33,7 @@ const useStyles = makeStyles(theme => ({
 function getStatus(props) {
   const runStatus = props.runStatus;
   if (props.warning || runStatus === RunStatus.Ended) {
+    console.log(props.warning, runStatus === RunStatus.Ended);
     return "ending";
   } else if (props.restRound) {
     return "resting";
@@ -48,19 +49,16 @@ export default function ClockFace(props) {
   const classes = useStyles();
   const minutes = leadingZero(toMinutes(props.timeRemaining));
   const seconds = leadingZero(toSeconds(props.timeRemaining));
-  const runStatus = props.runStatus;
   const statusClass = getStatus(props);
-  console.log(statusClass);
+  const paused =
+    props.runStatus === RunStatus.Paused ||
+    props.runStatus === RunStatus.Waiting;
+
   return (
     <Box m={1}>
       <Paper className={statusClass ? classes[statusClass] : ""}>
         <Typography align='center' className='digital' variant='h2'>
-          <span
-            className={
-              runStatus === RunStatus.Paused || runStatus === RunStatus.Waiting
-                ? classes.paused
-                : ""
-            }>
+          <span className={paused ? classes.paused : ""}>
             {minutes}:{seconds}
           </span>
         </Typography>
