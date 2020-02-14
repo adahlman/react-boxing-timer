@@ -27,8 +27,8 @@ export default class BoxingTimer extends React.Component {
       roundsCompleted: 0,
       restRound: false,
       matchEnded: false,
-      minutes: 0,
-      seconds: 20,
+      minutes: 5,
+      seconds: 0,
       restSeconds: 4,
       combos: false, // not implemented yet
       canEdit: true
@@ -62,7 +62,7 @@ export default class BoxingTimer extends React.Component {
   }
   changeSettings(event) {
     Object.entries(event).map(([key, value]) => {
-      this.setState({ [key]: value });
+      return this.setState({ [key]: value });
     });
     this.setState({ roundsCompleted: 0, matchEnded: false });
   }
