@@ -28,10 +28,9 @@ export default class BoxingTimer extends React.Component {
       numberOfRounds: 3,
       roundsCompleted: 0,
       restRound: false,
-      matchEnded: false,
-      minutes: 5,
-      seconds: 0,
-      restSeconds: 4,
+      minutes: 0,
+      seconds: 13,
+      restSeconds: 3,
       combos: false, // not implemented yet
       canEdit: true,
       runStatus: RunStatus.NotStarted,
@@ -51,7 +50,6 @@ export default class BoxingTimer extends React.Component {
       this.setState({ restRound: !restRound });
     } else {
       this.setState({
-        matchEnded: true,
         canEdit: true,
         runStatus: RunStatus.Ended,
       });
@@ -64,7 +62,6 @@ export default class BoxingTimer extends React.Component {
       this.setState({
         roundsCompleted: 0,
         restRound: false,
-        matchEnded: false,
         runStatus: RunStatus.NotStarted,
       });
     }
@@ -75,7 +72,6 @@ export default class BoxingTimer extends React.Component {
     });
     this.setState({
       roundsCompleted: 0,
-      matchEnded: false,
       runStatus: RunStatus.NotStarted,
     });
   }
@@ -92,6 +88,9 @@ export default class BoxingTimer extends React.Component {
     const minutes = this.state.minutes;
     const restRound = this.state.restRound;
     const roundsCompleted = this.state.roundsCompleted;
+    const runStatus = this.state.runStatus;
+    const canEdit =
+      runStatus === RunStatus.NotStarted || runStatus === RunStatus.Ended;
     const timeRemaining = restRound
       ? toMilliseconds(this.state.restSeconds)
       : toMilliseconds(seconds, minutes);
@@ -111,7 +110,6 @@ export default class BoxingTimer extends React.Component {
           restRound={restRound}
         />
         <Clock
-          matchEnded={this.state.matchEnded}
           timeRemaining={timeRemaining}
           countDown={!restRound}
           runStatus={this.state.runStatus}
