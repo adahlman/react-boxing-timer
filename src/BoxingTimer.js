@@ -6,6 +6,8 @@ import Clock from "./Clock";
 import Combos from "./Combos";
 import RoundSettings from "./RoundSettings";
 
+import { RunCodeEnum as RunStatus } from "./constants/enums";
+
 function Round(props) {
   const progress = [...Array(props.numberOfRounds)].map((e, i) => (
     <li className={i <= props.roundsCompleted ? "filled" : ""} key={i}></li>
@@ -31,10 +33,12 @@ export default class BoxingTimer extends React.Component {
       seconds: 0,
       restSeconds: 4,
       combos: false, // not implemented yet
-      canEdit: true
+      canEdit: true,
+      runStatus: RunStatus.NotStarted,
     };
     this.changeSettings = this.changeSettings.bind(this);
     this.lockSettings = this.lockSettings.bind(this);
+    this.runStatusChange = this.runStatusChange.bind(this);
   }
 
   incrementRound() {
@@ -46,7 +50,11 @@ export default class BoxingTimer extends React.Component {
       }
       this.setState({ restRound: !restRound });
     } else {
-      this.setState({ matchEnded: true, canEdit: true });
+      this.setState({
+        matchEnded: true,
+        canEdit: true,
+        runStatus: RunStatus.Ended,
+      });
     }
   }
 
@@ -56,7 +64,8 @@ export default class BoxingTimer extends React.Component {
       this.setState({
         roundsCompleted: 0,
         restRound: false,
-        matchEnded: false
+        matchEnded: false,
+        runStatus: RunStatus.NotStarted,
       });
     }
   }
@@ -64,7 +73,17 @@ export default class BoxingTimer extends React.Component {
     Object.entries(event).map(([key, value]) => {
       return this.setState({ [key]: value });
     });
-    this.setState({ roundsCompleted: 0, matchEnded: false });
+    this.setState({
+      roundsCompleted: 0,
+      matchEnded: false,
+      runStatus: RunStatus.NotStarted,
+    });
+  }
+  runStatusChange(event) {
+    console.log(event);
+    this.setState({
+      runStatus: event,
+    });
   }
 
   render() {
@@ -95,8 +114,10 @@ export default class BoxingTimer extends React.Component {
           matchEnded={this.state.matchEnded}
           timeRemaining={timeRemaining}
           countDown={!restRound}
+          runStatus={this.state.runStatus}
           lockSettings={this.lockSettings}
           incrementRound={() => this.incrementRound()}
+          runStatusChange={this.runStatusChange}
         />
 
         {/* TODO: Implement combo generator */}
