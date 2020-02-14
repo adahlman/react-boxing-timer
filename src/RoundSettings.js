@@ -11,9 +11,9 @@ import {
   FormLabel,
   MenuItem,
   Select,
-  Switch
+  Switch,
 } from "@material-ui/core/";
-import leadingZero from "./utils";
+import { leadingZero } from "./utils";
 
 function renderSelect(scale, min = 0) {
   const range = scale - min + 1;
@@ -48,7 +48,7 @@ export default class RoundSettings extends React.Component {
       minutes: props.minutes,
       seconds: props.seconds,
       combos: props.combos,
-      open: false
+      open: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -63,13 +63,13 @@ export default class RoundSettings extends React.Component {
   handleInputChange(event) {
     const target = event.target;
     this.setState({
-      [target.name]: target.type === "checkbox" ? target.checked : target.value
+      [target.name]: target.type === "checkbox" ? target.checked : target.value,
     });
   }
   handleSwitchChange = event => {
     const target = event.target;
     this.setState({
-      [target.name]: target.checked
+      [target.name]: target.checked,
     });
   };
   handleSubmit(event) {
