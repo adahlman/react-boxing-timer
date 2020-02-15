@@ -44,12 +44,7 @@ export default class RoundSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      settings: {
-        numberOfRounds: props.numberOfRounds,
-        minutes: props.minutes,
-        seconds: props.seconds,
-        combos: props.combos,
-      },
+      settings: props.settings,
       open: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);

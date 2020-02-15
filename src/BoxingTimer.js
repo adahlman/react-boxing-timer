@@ -13,13 +13,15 @@ export default class BoxingTimer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      numberOfRounds: 3,
-      roundsCompleted: 0,
+      settings: {
+        numberOfRounds: 3,
+        minutes: 0,
+        seconds: 13,
+        combos: false, // not implemented yet
+      },
       restRound: false,
-      minutes: 0,
-      seconds: 13,
       restSeconds: 3,
-      combos: false, // not implemented yet
+      roundsCompleted: 0,
       runStatus: RunStatus.NotStarted,
     };
     this.changeSettings = this.changeSettings.bind(this);
@@ -29,7 +31,7 @@ export default class BoxingTimer extends React.Component {
   incrementRound() {
     const roundsCompleted = this.state.roundsCompleted;
     const restRound = this.state.restRound;
-    if (roundsCompleted < this.state.numberOfRounds - 1) {
+    if (roundsCompleted < this.state.settings.numberOfRounds - 1) {
       if (restRound) {
         this.setState({ roundsCompleted: roundsCompleted + 1 });
       }
@@ -50,12 +52,10 @@ export default class BoxingTimer extends React.Component {
     }
   }
   changeSettings(event) {
-    Object.entries(event).map(([key, value]) => {
-      return this.setState({ [key]: value });
-    });
     this.setState({
       roundsCompleted: 0,
       runStatus: RunStatus.NotStarted,
+      settings: event,
     });
   }
   runStatusChange(event) {
@@ -63,9 +63,7 @@ export default class BoxingTimer extends React.Component {
   }
 
   render() {
-    const numberOfRounds = this.state.numberOfRounds;
-    const seconds = this.state.seconds;
-    const minutes = this.state.minutes;
+    const settings = this.state.settings;
     const restRound = this.state.restRound;
     const roundsCompleted = this.state.roundsCompleted;
     const runStatus = this.state.runStatus;
@@ -73,19 +71,16 @@ export default class BoxingTimer extends React.Component {
       runStatus === RunStatus.NotStarted || runStatus === RunStatus.Ended;
     const timeRemaining = restRound
       ? toMilliseconds(this.state.restSeconds)
-      : toMilliseconds(seconds, minutes);
+      : toMilliseconds(settings.seconds, settings.minutes);
     return (
       <div>
         <RoundSettings
-          numberOfRounds={numberOfRounds}
-          minutes={minutes}
-          seconds={seconds}
+          settings={settings}
           edit={canEdit}
-          combos={this.state.combos}
           updateSettings={this.changeSettings}
         />
         <Round
-          numberOfRounds={numberOfRounds}
+          numberOfRounds={settings.numberOfRounds}
           roundsCompleted={roundsCompleted}
           restRound={restRound}
         />
