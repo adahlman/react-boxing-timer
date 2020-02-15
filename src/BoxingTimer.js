@@ -32,11 +32,9 @@ export default class BoxingTimer extends React.Component {
       seconds: 13,
       restSeconds: 3,
       combos: false, // not implemented yet
-      canEdit: true,
       runStatus: RunStatus.NotStarted,
     };
     this.changeSettings = this.changeSettings.bind(this);
-    this.lockSettings = this.lockSettings.bind(this);
     this.runStatusChange = this.runStatusChange.bind(this);
   }
 
@@ -50,19 +48,16 @@ export default class BoxingTimer extends React.Component {
       this.setState({ restRound: !restRound });
     } else {
       this.setState({
-        canEdit: true,
         runStatus: RunStatus.Ended,
       });
     }
   }
 
-  lockSettings(event) {
-    this.setState({ canEdit: event });
-    if (event) {
+  restartAll() {
+    if (this.state.runStatus === RunStatus.NotStarted) {
       this.setState({
-        roundsCompleted: 0,
         restRound: false,
-        runStatus: RunStatus.NotStarted,
+        roundsCompleted: 0,
       });
     }
   }
@@ -76,10 +71,7 @@ export default class BoxingTimer extends React.Component {
     });
   }
   runStatusChange(event) {
-    console.log(event);
-    this.setState({
-      runStatus: event,
-    });
+    this.setState({ runStatus: event }, this.restartAll);
   }
 
   render() {
@@ -100,7 +92,7 @@ export default class BoxingTimer extends React.Component {
           numberOfRounds={numberOfRounds}
           minutes={minutes}
           seconds={seconds}
-          edit={this.state.canEdit}
+          edit={canEdit}
           combos={this.state.combos}
           updateSettings={this.changeSettings}
         />
@@ -113,7 +105,6 @@ export default class BoxingTimer extends React.Component {
           timeRemaining={timeRemaining}
           countDown={!restRound}
           runStatus={this.state.runStatus}
-          lockSettings={this.lockSettings}
           incrementRound={() => this.incrementRound()}
           runStatusChange={this.runStatusChange}
         />
