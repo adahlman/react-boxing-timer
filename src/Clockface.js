@@ -33,7 +33,6 @@ const useStyles = makeStyles(theme => ({
 function getStatus(props) {
   const runStatus = props.runStatus;
   if (props.warning || runStatus === RunStatus.Ended) {
-    console.log(props.warning, runStatus === RunStatus.Ended);
     return "ending";
   } else if (props.restRound) {
     return "resting";

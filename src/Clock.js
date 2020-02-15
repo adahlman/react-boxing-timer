@@ -6,6 +6,7 @@ import { RunCodeEnum as RunStatus } from "./constants/enums";
 import { lookup } from "./utils";
 
 import "./Clock.scss";
+const ReactDOM = require("react-dom");
 
 export default class Clock extends React.Component {
   constructor(props) {
@@ -31,12 +32,17 @@ export default class Clock extends React.Component {
 
   handleKeyPress(event) {
     const runStatus = this.props.runStatus;
-    console.log(runStatus);
     if (
       event.keyCode === 32 &&
       (runStatus !== RunStatus.Ended || runStatus !== RunStatus.Waiting)
     ) {
-      this.handleToggle(event);
+      // han default behavior if start/stop toggle button is still selected
+      if (
+        document.activeElement === ReactDOM.findDOMNode(this.refs.startButton)
+      ) {
+        return;
+      }
+      this.handleToggle();
     }
   }
 
@@ -46,7 +52,6 @@ export default class Clock extends React.Component {
       timeRemaining: this.props.timeRemaining,
     });
     this.props.runStatusChange(RunStatus.NotStarted);
-    this.props.lockSettings(true);
   }
 
   handleToggle() {
@@ -56,7 +61,6 @@ export default class Clock extends React.Component {
         timeRemaining: this.props.timeRemaining,
       });
       this.start();
-      this.props.lockSettings(false);
       return;
     }
     if (this.props.runStatus !== RunStatus.Ended) {
@@ -135,7 +139,7 @@ export default class Clock extends React.Component {
         ? this.state.timeRemaining
         : this.props.timeRemaining;
     // lookup(this.props.runStatus, RunStatus);
-    // console.log("render", this.state);
+
     return (
       <div>
         <Clockface
@@ -153,6 +157,7 @@ export default class Clock extends React.Component {
             <Button
               variant='contained'
               color='primary'
+              ref='startButton'
               disabled={
                 runStatus === RunStatus.Ended || runStatus === RunStatus.Waiting
               }
