@@ -6,6 +6,8 @@ import Clock from "./Clock";
 import Combos from "./Combos";
 import RoundSettings from "./RoundSettings";
 
+import { RunCodeEnum as RunStatus } from "./constants/enums";
+
 function Round(props) {
   const progress = [...Array(props.numberOfRounds)].map((e, i) => (
     <li className={i <= props.roundsCompleted ? "filled" : ""} key={i}></li>
@@ -26,15 +28,14 @@ export default class BoxingTimer extends React.Component {
       numberOfRounds: 3,
       roundsCompleted: 0,
       restRound: false,
-      matchEnded: false,
-      minutes: 5,
-      seconds: 0,
-      restSeconds: 4,
+      minutes: 0,
+      seconds: 13,
+      restSeconds: 3,
       combos: false, // not implemented yet
-      canEdit: true
+      runStatus: RunStatus.NotStarted,
     };
     this.changeSettings = this.changeSettings.bind(this);
-    this.lockSettings = this.lockSettings.bind(this);
+    this.runStatusChange = this.runStatusChange.bind(this);
   }
 
   incrementRound() {
@@ -46,17 +47,17 @@ export default class BoxingTimer extends React.Component {
       }
       this.setState({ restRound: !restRound });
     } else {
-      this.setState({ matchEnded: true, canEdit: true });
+      this.setState({
+        runStatus: RunStatus.Ended,
+      });
     }
   }
 
-  lockSettings(event) {
-    this.setState({ canEdit: event });
-    if (event) {
+  restartAll() {
+    if (this.state.runStatus === RunStatus.NotStarted) {
       this.setState({
-        roundsCompleted: 0,
         restRound: false,
-        matchEnded: false
+        roundsCompleted: 0,
       });
     }
   }
@@ -64,7 +65,13 @@ export default class BoxingTimer extends React.Component {
     Object.entries(event).map(([key, value]) => {
       return this.setState({ [key]: value });
     });
-    this.setState({ roundsCompleted: 0, matchEnded: false });
+    this.setState({
+      roundsCompleted: 0,
+      runStatus: RunStatus.NotStarted,
+    });
+  }
+  runStatusChange(event) {
+    this.setState({ runStatus: event }, this.restartAll);
   }
 
   render() {
@@ -73,6 +80,9 @@ export default class BoxingTimer extends React.Component {
     const minutes = this.state.minutes;
     const restRound = this.state.restRound;
     const roundsCompleted = this.state.roundsCompleted;
+    const runStatus = this.state.runStatus;
+    const canEdit =
+      runStatus === RunStatus.NotStarted || runStatus === RunStatus.Ended;
     const timeRemaining = restRound
       ? toMilliseconds(this.state.restSeconds)
       : toMilliseconds(seconds, minutes);
@@ -82,7 +92,7 @@ export default class BoxingTimer extends React.Component {
           numberOfRounds={numberOfRounds}
           minutes={minutes}
           seconds={seconds}
-          edit={this.state.canEdit}
+          edit={canEdit}
           combos={this.state.combos}
           updateSettings={this.changeSettings}
         />
@@ -92,11 +102,11 @@ export default class BoxingTimer extends React.Component {
           restRound={restRound}
         />
         <Clock
-          matchEnded={this.state.matchEnded}
           timeRemaining={timeRemaining}
           countDown={!restRound}
-          lockSettings={this.lockSettings}
+          runStatus={this.state.runStatus}
           incrementRound={() => this.incrementRound()}
+          runStatusChange={this.runStatusChange}
         />
 
         {/* TODO: Implement combo generator */}
