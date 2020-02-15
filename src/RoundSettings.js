@@ -44,10 +44,12 @@ export default class RoundSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      numberOfRounds: props.numberOfRounds,
-      minutes: props.minutes,
-      seconds: props.seconds,
-      combos: props.combos,
+      settings: {
+        numberOfRounds: props.numberOfRounds,
+        minutes: props.minutes,
+        seconds: props.seconds,
+        combos: props.combos,
+      },
       open: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -62,26 +64,24 @@ export default class RoundSettings extends React.Component {
   };
   handleInputChange(event) {
     const target = event.target;
+    const settings = this.state.settings;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const newSettings = { ...settings, [target.name]: value };
+
     this.setState({
-      [target.name]: target.type === "checkbox" ? target.checked : target.value,
+      settings: newSettings,
     });
   }
-  handleSwitchChange = event => {
-    const target = event.target;
-    this.setState({
-      [target.name]: target.checked,
-    });
-  };
+
   handleSubmit(event) {
-    this.props.updateSettings(this.state);
+    this.props.updateSettings(this.state.settings);
     this.handleCloseDialog();
   }
 
   render() {
     const open = this.state.open;
-    const numberOfRounds = this.state.numberOfRounds;
-    const seconds = this.state.seconds;
-    const minutes = this.state.minutes;
+    const settings = this.state.settings;
+
     return (
       <div>
         <Grid container justify='flex-end'>
@@ -101,7 +101,7 @@ export default class RoundSettings extends React.Component {
                 <FormLabel component='legend'>Number of Rounds</FormLabel>
                 <CreateSelect
                   name='numberOfRounds'
-                  value={numberOfRounds}
+                  value={settings.numberOfRounds}
                   handleInputChange={this.handleInputChange}
                   max={10}
                   min={1}
@@ -115,7 +115,7 @@ export default class RoundSettings extends React.Component {
                     <FormControl>
                       <CreateSelect
                         name='minutes'
-                        value={minutes}
+                        value={settings.minutes}
                         max={15}
                         handleInputChange={this.handleInputChange}
                       />
@@ -128,7 +128,7 @@ export default class RoundSettings extends React.Component {
                     <FormControl>
                       <CreateSelect
                         name='seconds'
-                        value={seconds}
+                        value={settings.seconds}
                         max={59}
                         handleInputChange={this.handleInputChange}
                       />
